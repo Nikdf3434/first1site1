@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+<div class="container text-center mt-5">
+    <h1 class="display-4">Добро пожаловать на наш сайт-визуализатор данных!</h1>
+    <p class="lead">Превратите сложные наборы данных в понятные графики и диаграммы за несколько кликов. Наш инструмент создан для удобного анализа и представления информации в визуальном формате.</p>
+    <img src="{% static 'img/rtx4090.jpg' %}" width="150" alt="Пример визуализации">
+    <div class="mt-4">
+        <a href="/register/" class="btn btn-primary btn-lg">Начать сейчас</a>
+    </div>
+</div>
+{% endblock %}

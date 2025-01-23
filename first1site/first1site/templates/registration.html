@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% block content%}
+    <h1>Регистрация</h1>
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="username" placeholder="Username">
+        <input type="password" name="password" placeholder="Password">
+        <input type="password" name="password2" placeholder="Confirm Password"> 
+        <button type="submit">Зарегистрироваться</button>
+    </form>
+{%endblock%}

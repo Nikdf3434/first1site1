@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% block content%}
+    <h1 style = 'color: red'>Название: {{book.title}}</h1>
+    <h5>Автор: {{book.author}}</h5>
+    <h5>Издательсво: {{book.publishing}}</h5>
+    <h5>Количество страниц: {{book.pages}}</h5>
+    <h5>Цена: {{book.prace}}</h5>
+{%endblock%}
