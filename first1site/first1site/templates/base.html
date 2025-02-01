@@ -10,9 +10,8 @@
 <body>
     <div id = 'header'>
         <h1>{{user.username}}</h1>
-        <h1>Добро пожаловать на сайт книг!</h1>
-        <a href="{% url 'books' %}">
-            <button>Перейти к списку книг</button>
+        <a href="{% url 'load_file' %}">
+            <button>Перейти к списку файлов</button>
         </a>
         <a href="{% url 'login' %}">
             <button>Авторизация</button>

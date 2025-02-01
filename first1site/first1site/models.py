@@ -19,15 +19,6 @@ class Books(models.Model):
 
     def __str__(self):
         return f'{self.title}: {self.author_id}: {self.publishing}'
-    
-# class Login(models.Model):
-#     username = models.CharField(max_length=150, blank=False)
-#     password = models.CharField(max_length=128, blank=False)
-
-# class Registration(models.Model):
-#     username = models.CharField(max_length=150, blank=False)
-#     password = models.CharField(max_length=128, blank=False)
-#     confirm_password = models.CharField(max_length=128, blank=False)
 
 class NewUser(AbstractUser):
     pass

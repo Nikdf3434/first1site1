@@ -7,52 +7,39 @@ from .forms import BookForm, UserFileForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+import pandas as pd
+import matplotlib.pyplot as plt
+from io import BytesIO
+import base64
 
 def home(request):
-    
-    # for i in all_books:
-    #     print(i.id, i.title, i.prace)
-
-    # new_book = Books(title="Тест2", author="Н.Гоголь", publishing="Moscow", pages="600", prace="25")
-    # new_book.save()
-
-    # filtred_book = Books.objects.filter(publishing = 'Санкт-Петербург')
-    # print(filtred_book)
-
-    # book_to_change = Books.objects.get(id=17)
-    # print(book_to_change)
-    # book_to_change.title = 'Мёртвые души (18...)'
-    # book_to_change.save()
-    
-    # Books.objects.get(id=15).delete()
-    # return HttpResponse('Hello world')
     return render(request, 'home.html')
 
-def books(request):
-    # return HttpResponse('Page with books')
-    query = request.GET.get('q')
-    if query: 
-        all_books = Books.objects.filter(title__icontains = query)
-    else:
-        all_books = Books.objects.all()
-        print(all_books)
-    return render(request, 'list_of_books.html', {'all_books': all_books})
+# def books(request):
+#     # return HttpResponse('Page with books')
+#     query = request.GET.get('q')
+#     if query: 
+#         all_books = Books.objects.filter(title__icontains = query)
+#     else:
+#         all_books = Books.objects.all()
+#         print(all_books)
+#     return render(request, 'list_of_books.html', {'all_books': all_books})
 
 
-def book_id(request, book_id):
-    book = Books.objects.get(id=book_id)
-    return render(request, 'site_book_info.html', {'book': book})
+# def book_id(request, book_id):
+#     book = Books.objects.get(id=book_id)
+#     return render(request, 'site_book_info.html', {'book': book})
 
-@login_required
-def add_book(request):
-    if request.method == 'POST':
-        form = BookForm(request.POST)
-        if form.is_valid():
-            form.save()
-        return HttpResponseRedirect(request.path)
-    else:
-        form = BookForm()
-    return render(request, 'book_form.html', {'form': form})
+# @login_required
+# def add_book(request):
+#     if request.method == 'POST':
+#         form = BookForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#         return HttpResponseRedirect(request.path)
+#     else:
+#         form = BookForm()
+#     return render(request, 'book_form.html', {'form': form})
 
 def login_view(request):
     if request.method == 'POST':
@@ -104,12 +91,78 @@ def load_file(request):
         return HttpResponseRedirect(request.path)
     else:
         form = UserFileForm()
-    all_files = UserFile.objects.all()
-    # print(all_files)
+    all_files = UserFile.objects.filter(user=request.user)
     return render(request, 'file_form.html', {'file_form': form, 'all_files': all_files})
 
-
-
 def file_id(request, file_id):
+    return render(request, 'id_file.html', {'file_id': file_id})
+     
+def grafic(request, file_id):
     file = UserFile.objects.get(id=file_id)
-    return render(request, 'id_file.html', {'file': file})
+    file_path = file.file.path
+    
+    df = pd.read_csv(file_path)
+    df=df.head(5)
+    x = request.GET.get('x')
+    y = request.GET.get('y')
+    x_data = df[x]
+    y_data = df[y]
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(x_data, y_data, label=y)
+    plt.title('График данных из CSV', fontsize=16)
+    plt.xlabel(x, fontsize=12)
+    plt.ylabel(y, fontsize=12)
+    plt.legend()
+    plt.grid(True)
+
+    buf = BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+
+    image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+    buf.close()
+        
+
+
+    return render(request, 'grafic.html', {'file': file, 'image_base64': image_base64})
+
+def pregrafic_and_prediagramm(request, file_id):
+    file = UserFile.objects.get(id=file_id)
+    file_path = file.file.path
+    df = pd.read_csv(file_path)
+    columns = df.columns.tolist()[1:]
+    if request.method == 'POST':
+        selected_x = request.POST.get('x')
+        # selected_y = request.POST.get('y') 
+        selected_y = request.POST.getlist('y')
+        
+        return redirect(f"/add_file/{file_id}/pregrafic_and_prediagramm/grafic/?x={selected_x}&y={selected_y}")
+    return render(request, 'pregrafic_and_prediagramm.html', {'columns': columns, 'file_id': file_id})
+
+def diagramm(request, file_id):
+    file = UserFile.objects.get(id=file_id)
+    file_path = file.file.path
+    
+    df = pd.read_csv(file_path)
+    df=df.head(5)
+    x = request.GET.get('x')
+    y = request.GET.get('y')
+    x_data = df[x]
+    y_data = df[y]
+
+    plt.figure(figsize=(10, 6))
+    plt.bar(x_data, y_data, label=y, color='blue')
+    plt.title('Диаграмма из CSV-файла', fontsize=16)
+    plt.xlabel(x, fontsize=12)
+    plt.ylabel(y, fontsize=12)
+    plt.show()
+
+    buf = BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+
+    image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+    buf.close()
+
+    return render(request, 'diagramm.html', {'file': file, 'image_base64': image_base64})

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content%}
+    <form method="post">
+        {% csrf_token %}
+        <h3>Выберите значение для оси x(только одно значение)</h3>
+        {% for item in columns %}
+            <label>
+                <input type="radio" name="x" value="{{ item }}"> {{ item }}
+            </label><br>
+        {% endfor %}
+
+        <h3>Выберите значение для оси у</h3>
+        {% for item in columns %}
+            <label>
+                <input type="checkbox" name="y" value="{{ item }}"> {{ item }}
+            </label><br>
+        {% endfor %}
+        <button type="submit">Отправить</button>
+    </form>
+{%endblock%}

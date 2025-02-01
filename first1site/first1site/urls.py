@@ -23,15 +23,18 @@ from django.conf import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
-    path('books/', views.books, name='books'),
-    path('books/<int:book_id>', views.book_id, name='book_id'),
-    path('books/add_book', views.add_book, name='add_book'),
+    # path('books/', views.books, name='books'),
+    # path('books/<int:book_id>', views.book_id, name='book_id'),
+    # path('books/add_book', views.add_book, name='add_book'),
     path('login/', views.login_view, name='login'),
     path('registration/', views.registration_view, name='registration'),
     path('logout/', views.user_logout, name='logout'),
     path('password-reset/', views.password_reset_, name='password_reset'),
     path('add_file/', views.load_file, name='load_file'),
     path('add_file/<int:file_id>', views.file_id, name='file_id'),
+    path('add_file/<int:file_id>/pregrafic_and_prediagramm/grafic/', views.grafic, name='grafic'),
+    path('add_file/<int:file_id>/pregrafic_and_prediagramm/', views.pregrafic_and_prediagramm, name='pregrafic_and_prediagramm'),
+    path('add_file/<int:file_id>/pregrafic_and_prediagramm/diagramm/', views.diagramm, name='diagramm'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

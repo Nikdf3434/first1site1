@@ -2,7 +2,11 @@
 {% load static %}
 {% block content%}
     <h1>Выберите тип</h1>
-    <button>График</button>
+    <a href="{% url 'pregrafic_and_prediagramm' file_id=file_id %}">
+        <button type="submit">График</button>
+    </a>
+    <a href="{% url 'pregrafic_and_prediagramm' file_id=file_id %}">
     <button>Столбчатая диаграмма</button>
+    </a>
     <button>Круговая диаграмма</button>
 {%endblock%}
