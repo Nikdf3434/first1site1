@@ -1,9 +1,7 @@
-from django.http import HttpResponse, HttpResponseRedirect
-from .models import Books, NewUser, UserFile
+from django.http import HttpResponseRedirect
+from .models import NewUser, UserFile
 from django.shortcuts import render, redirect
-from .forms import BookForm, UserFileForm
-# from .forms import LoginForm
-# from .forms import RegistrationForm
+from .forms import UserFileForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
@@ -102,17 +100,19 @@ def grafic(request, file_id):
     file_path = file.file.path
     
     df = pd.read_csv(file_path)
-    df=df.head(5)
+    df = df.head(5)
     x = request.GET.get('x')
-    y = request.GET.get('y')
+    y_list = request.GET.getlist('y')
     x_data = df[x]
-    y_data = df[y]
 
     plt.figure(figsize=(10, 6))
-    plt.plot(x_data, y_data, label=y)
+    for y in y_list:
+        y_data = df[y]
+        plt.plot(x_data, y_data, label=y)
+    
     plt.title('График данных из CSV', fontsize=16)
     plt.xlabel(x, fontsize=12)
-    plt.ylabel(y, fontsize=12)
+    plt.ylabel('Значения', fontsize=12)
     plt.legend()
     plt.grid(True)
 
@@ -123,24 +123,46 @@ def grafic(request, file_id):
     image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
     buf.close()
         
-
-
     return render(request, 'grafic.html', {'file': file, 'image_base64': image_base64})
 
-def pregrafic_and_prediagramm(request, file_id):
+def pregrafic(request, file_id):
     file = UserFile.objects.get(id=file_id)
     file_path = file.file.path
-    df = pd.read_csv(file_path)
-    columns = df.columns.tolist()[1:]
+    df = pd.read_csv(file_path, delimiter=';')
+    
+    all_columns = df.columns.tolist()[1:]
+    string_columns = [col for col in all_columns if pd.api.types.is_string_dtype(df[col])]
+    numeric_columns = [col for col in all_columns if pd.api.types.is_numeric_dtype(df[col])]
+    
     if request.method == 'POST':
         selected_x = request.POST.get('x')
-        # selected_y = request.POST.get('y') 
         selected_y = request.POST.getlist('y')
-        
-        return redirect(f"/add_file/{file_id}/pregrafic_and_prediagramm/grafic/?x={selected_x}&y={selected_y}")
-    return render(request, 'pregrafic_and_prediagramm.html', {'columns': columns, 'file_id': file_id})
 
-def diagramm(request, file_id):
+        u = f"x={selected_x}"
+        for yzn in selected_y:
+            u += f"&y={yzn}"
+        return redirect(f"/add_file/{file_id}/pregrafic/grafic/?{u}")
+    
+    return render(request, 'pregrafic.html', {'string_columns': string_columns,'numeric_columns': numeric_columns,'file_id': file_id})
+
+def prestolb_diagramm(request, file_id):
+    file = UserFile.objects.get(id=file_id)
+    file_path = file.file.path
+    df = pd.read_csv(file_path, delimiter=';')
+    
+    all_columns = df.columns.tolist()[1:]
+    string_columns = [col for col in all_columns if pd.api.types.is_string_dtype(df[col])]
+    numeric_columns = [col for col in all_columns if pd.api.types.is_numeric_dtype(df[col])]
+    
+    if request.method == 'POST':
+        selected_x = request.POST.get('x')
+        selected_y = request.POST.get('y')
+        
+        return redirect(f"/add_file/{file_id}/prestolb_diagramm/stolb_diagramm/?x={selected_x}&y={selected_y}")
+    
+    return render(request, 'prestolb_diagramm.html', {'string_columns': string_columns,'numeric_columns': numeric_columns,'file_id': file_id})
+
+def stolb_diagramm(request, file_id):
     file = UserFile.objects.get(id=file_id)
     file_path = file.file.path
     
@@ -156,7 +178,6 @@ def diagramm(request, file_id):
     plt.title('Диаграмма из CSV-файла', fontsize=16)
     plt.xlabel(x, fontsize=12)
     plt.ylabel(y, fontsize=12)
-    plt.show()
 
     buf = BytesIO()
     plt.savefig(buf, format='png')
@@ -165,4 +186,52 @@ def diagramm(request, file_id):
     image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
     buf.close()
 
-    return render(request, 'diagramm.html', {'file': file, 'image_base64': image_base64})
+    return render(request, 'stolb_diagramm.html', {'file': file, 'image_base64': image_base64})
+
+def round_diagramm(request, file_id):
+    file = UserFile.objects.get(id=file_id)
+    file_path = file.file.path
+
+    df = pd.read_csv(file_path)
+    df = df.head(5)
+    x = request.GET.get('x')
+    y = request.GET.get('y')
+
+    categories = df[x]
+    values = df[y]
+
+    plt.figure(figsize=(8, 8))
+    plt.pie(
+        values,
+        labels=categories,
+        autopct='%d%%',
+        startangle=90,
+        colors=['#ff9999', '#66b3ff', '#99ff99', '#ffcc99', 'blue', 'red', 'green']
+    )
+    plt.title('Круговая диаграмма')
+
+    buf = BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+
+    image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+    buf.close()
+
+    return render(request, 'round_diagramm.html', {'file': file, 'image_base64': image_base64})
+
+def preround_diagramm(request, file_id):
+    file = UserFile.objects.get(id=file_id)
+    file_path = file.file.path
+    df = pd.read_csv(file_path, delimiter=';')
+    
+    all_columns = df.columns.tolist()[1:]
+    string_columns = [col for col in all_columns if pd.api.types.is_string_dtype(df[col])]
+    numeric_columns = [col for col in all_columns if pd.api.types.is_numeric_dtype(df[col])]
+    
+    if request.method == 'POST':
+        selected_x = request.POST.get('x')
+        selected_y = request.POST.get('y')
+        
+        return redirect(f"/add_file/{file_id}/preround_diagramm/round_diagramm/?x={selected_x}&y={selected_y}")
+    
+    return render(request, 'preround_diagramm.html', {'string_columns': string_columns,'numeric_columns': numeric_columns,'file_id': file_id})
