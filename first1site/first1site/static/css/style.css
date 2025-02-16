@@ -1,50 +1,61 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #444;
-    color: white;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background: linear-gradient(135deg, #111, #444); 
+    color: #f1f1f1;
     margin: 0;
     padding: 0;
     text-align: center;
 }
 
-h1 {
-    color: white;
-    text-align: center;
+#header {
+    background: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    margin-bottom: 20px;
+}
+
+#main {
+    background: rgba(255, 255, 255, 0.05);
+    min-height: 750px;
+    padding: 40px;
+}
+
+#footer {
+    background: #000;
+    color: #fff;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+h1, h2, h3 {
+    color: #fff;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
 }
 
 button {
     background-color: #27ae60;
-    color: white;
+    color: #fff;
     border: none;
     border-radius: 10px;
-    padding: 10px 20px;
+    padding: 12px 25px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-/* button:hover {
+button:hover {
     background-color: #219653;
-} */
+    transform: scale(1.05);
+}
 
 a {
+    color: #27ae60;
     text-decoration: none;
+    transition: color 0.3s ease;
 }
 
-/* a button {
-    margin: 10px;
-} */
-
-#main {
-    height: 750px;
-}
-
-#footer {
-    height: 100px;
-}
-
-#header {
-    height: 150px;
-    margin: 0
+a:hover {
+    color: #fff;
 }
 
 div {

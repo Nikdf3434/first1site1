@@ -1,5 +1,13 @@
 {% extends "base.html" %}
 {% load static %}
-{% block content%}
-    <img src="data:image/png;base64,{{ image_base64 }}" alt="Столбчатая диаграмма">
-{%endblock%}
+{% block content %}
+    <img src="data:image/png;base64,{{ image_base64 }}" alt="Круговая диаграмма">
+    <div style="margin-top: 20px;">
+        {% with current_params=request.GET.urlencode %}
+            <a href="?{{ current_params }}&download=png" class="download-link">Скачать PNG</a> |
+            <a href="?{{ current_params }}&download=jpg" class="download-link">Скачать JPG</a> |
+            <a href="?{{ current_params }}&download=pdf" class="download-link">Скачать PDF</a>
+        {% endwith %}
+    </div>
+{% endblock %}
+

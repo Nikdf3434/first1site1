@@ -1,4 +1,4 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from .models import NewUser, UserFile
 from django.shortcuts import render, redirect
 from .forms import UserFileForm
@@ -98,7 +98,7 @@ def file_id(request, file_id):
 def grafic(request, file_id):
     file = UserFile.objects.get(id=file_id)
     file_path = file.file.path
-    
+
     df = pd.read_csv(file_path)
     df = df.head(5)
     x = request.GET.get('x')
@@ -109,26 +109,43 @@ def grafic(request, file_id):
     for y in y_list:
         y_data = df[y]
         plt.plot(x_data, y_data, label=y)
-    
+
     plt.title('График данных из CSV', fontsize=16)
     plt.xlabel(x, fontsize=12)
     plt.ylabel('Значения', fontsize=12)
     plt.legend()
     plt.grid(True)
 
+    download_format = request.GET.get('download', None)
+    if download_format:
+        buf = BytesIO()
+        plt.savefig(buf, format=download_format)
+        buf.seek(0)
+        if download_format.lower() in ['jpg', 'jpeg']:
+            content_type = 'image/jpeg'
+        elif download_format.lower() == 'pdf':
+            content_type = 'application/pdf'
+        else:
+            content_type = 'image/png'
+        response = HttpResponse(buf.getvalue(), content_type=content_type)
+        response['Content-Disposition'] = f'attachment; filename=grafic.{download_format}'
+        buf.close()
+        plt.close()
+        return response
+
     buf = BytesIO()
     plt.savefig(buf, format='png')
     buf.seek(0)
-
     image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
     buf.close()
-        
+    plt.close()
+
     return render(request, 'grafic.html', {'file': file, 'image_base64': image_base64})
 
 def pregrafic(request, file_id):
     file = UserFile.objects.get(id=file_id)
     file_path = file.file.path
-    df = pd.read_csv(file_path, delimiter=';')
+    df = pd.read_csv(file_path)
     
     all_columns = df.columns.tolist()[1:]
     string_columns = [col for col in all_columns if pd.api.types.is_string_dtype(df[col])]
@@ -148,7 +165,10 @@ def pregrafic(request, file_id):
 def prestolb_diagramm(request, file_id):
     file = UserFile.objects.get(id=file_id)
     file_path = file.file.path
-    df = pd.read_csv(file_path, delimiter=';')
+    try:
+        df = pd.read_csv(file_path, delimiter=',')
+    except:
+        df = pd.read_csv(file_path, delimiter=';')
     
     all_columns = df.columns.tolist()[1:]
     string_columns = [col for col in all_columns if pd.api.types.is_string_dtype(df[col])]
@@ -165,9 +185,9 @@ def prestolb_diagramm(request, file_id):
 def stolb_diagramm(request, file_id):
     file = UserFile.objects.get(id=file_id)
     file_path = file.file.path
-    
+
     df = pd.read_csv(file_path)
-    df=df.head(5)
+    df = df.head(5)
     x = request.GET.get('x')
     y = request.GET.get('y')
     x_data = df[x]
@@ -179,12 +199,29 @@ def stolb_diagramm(request, file_id):
     plt.xlabel(x, fontsize=12)
     plt.ylabel(y, fontsize=12)
 
+    download_format = request.GET.get('download', None)
+    if download_format:
+        buf = BytesIO()
+        plt.savefig(buf, format=download_format)
+        buf.seek(0)
+        if download_format.lower() in ['jpg', 'jpeg']:
+            content_type = 'image/jpeg'
+        elif download_format.lower() == 'pdf':
+            content_type = 'application/pdf'
+        else:
+            content_type = 'image/png'
+        response = HttpResponse(buf.getvalue(), content_type=content_type)
+        response['Content-Disposition'] = f'attachment; filename=stolb_diagramm.{download_format}'
+        buf.close()
+        plt.close()
+        return response
+
     buf = BytesIO()
     plt.savefig(buf, format='png')
     buf.seek(0)
-
     image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
     buf.close()
+    plt.close()
 
     return render(request, 'stolb_diagramm.html', {'file': file, 'image_base64': image_base64})
 
@@ -205,24 +242,41 @@ def round_diagramm(request, file_id):
         values,
         labels=categories,
         autopct='%d%%',
-        startangle=90,
+        startangle=90, 
         colors=['#ff9999', '#66b3ff', '#99ff99', '#ffcc99', 'blue', 'red', 'green']
     )
     plt.title('Круговая диаграмма')
 
+    download_format = request.GET.get('download', None)
+    if download_format:
+        buf = BytesIO()
+        plt.savefig(buf, format=download_format)
+        buf.seek(0)
+        if download_format.lower() in ['jpg', 'jpeg']:
+            content_type = 'image/jpeg'
+        elif download_format.lower() == 'pdf':
+            content_type = 'application/pdf'
+        else:
+            content_type = 'image/png'
+        response = HttpResponse(buf.getvalue(), content_type=content_type)
+        response['Content-Disposition'] = f'attachment; filename=round_diagramm.{download_format}'
+        buf.close()
+        plt.close()
+        return response
+
     buf = BytesIO()
     plt.savefig(buf, format='png')
     buf.seek(0)
-
     image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
     buf.close()
+    plt.close()
 
     return render(request, 'round_diagramm.html', {'file': file, 'image_base64': image_base64})
 
 def preround_diagramm(request, file_id):
     file = UserFile.objects.get(id=file_id)
     file_path = file.file.path
-    df = pd.read_csv(file_path, delimiter=';')
+    df = pd.read_csv(file_path)
     
     all_columns = df.columns.tolist()[1:]
     string_columns = [col for col in all_columns if pd.api.types.is_string_dtype(df[col])]
