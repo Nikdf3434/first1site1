@@ -10,9 +10,11 @@
 <body>
     <div id = 'header'>
         <h1>{{user.username}}</h1>
+        {% if user.is_authenticated %}
         <a href="{% url 'load_file' %}">
             <button>Перейти к списку файлов</button>
         </a>
+        {% endif %}
         <a href="{% url 'login' %}">
             <button>Авторизация</button>
         </a>

@@ -10,34 +10,9 @@ import matplotlib.pyplot as plt
 from io import BytesIO
 import base64
 
+@login_required
 def home(request):
     return render(request, 'home.html')
-
-# def books(request):
-#     # return HttpResponse('Page with books')
-#     query = request.GET.get('q')
-#     if query: 
-#         all_books = Books.objects.filter(title__icontains = query)
-#     else:
-#         all_books = Books.objects.all()
-#         print(all_books)
-#     return render(request, 'list_of_books.html', {'all_books': all_books})
-
-
-# def book_id(request, book_id):
-#     book = Books.objects.get(id=book_id)
-#     return render(request, 'site_book_info.html', {'book': book})
-
-# @login_required
-# def add_book(request):
-#     if request.method == 'POST':
-#         form = BookForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#         return HttpResponseRedirect(request.path)
-#     else:
-#         form = BookForm()
-#     return render(request, 'book_form.html', {'form': form})
 
 def login_view(request):
     if request.method == 'POST':
@@ -62,7 +37,7 @@ def registration_view(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('/') 
+                return redirect('/')
             else:
                 return render(request, 'registration.html')
     return render(request, 'registration.html')
@@ -94,12 +69,18 @@ def load_file(request):
 
 def file_id(request, file_id):
     return render(request, 'id_file.html', {'file_id': file_id})
+
+def read_csv_auto(file_path):
+    df = pd.read_csv(file_path, engine='python')
+    if len(df.columns) == 1:
+        df = pd.read_csv(file_path, sep=';', engine='python')
+    return df
      
 def grafic(request, file_id):
     file = UserFile.objects.get(id=file_id)
     file_path = file.file.path
 
-    df = pd.read_csv(file_path)
+    df = read_csv_auto(file_path)
     df = df.head(5)
     x = request.GET.get('x')
     y_list = request.GET.getlist('y')
@@ -160,7 +141,9 @@ def pregrafic(request, file_id):
             u += f"&y={yzn}"
         return redirect(f"/add_file/{file_id}/pregrafic/grafic/?{u}")
     
-    return render(request, 'pregrafic.html', {'string_columns': string_columns,'numeric_columns': numeric_columns,'file_id': file_id})
+    return render(request, 'pregrafic.html', {'string_columns': string_columns,
+                                               'numeric_columns': numeric_columns,
+                                               'file_id': file_id})
 
 def prestolb_diagramm(request, file_id):
     file = UserFile.objects.get(id=file_id)
@@ -180,13 +163,15 @@ def prestolb_diagramm(request, file_id):
         
         return redirect(f"/add_file/{file_id}/prestolb_diagramm/stolb_diagramm/?x={selected_x}&y={selected_y}")
     
-    return render(request, 'prestolb_diagramm.html', {'string_columns': string_columns,'numeric_columns': numeric_columns,'file_id': file_id})
+    return render(request, 'prestolb_diagramm.html', {'string_columns': string_columns,
+                                                        'numeric_columns': numeric_columns,
+                                                        'file_id': file_id})
 
 def stolb_diagramm(request, file_id):
     file = UserFile.objects.get(id=file_id)
     file_path = file.file.path
 
-    df = pd.read_csv(file_path)
+    df = read_csv_auto(file_path)
     df = df.head(5)
     x = request.GET.get('x')
     y = request.GET.get('y')
@@ -229,7 +214,7 @@ def round_diagramm(request, file_id):
     file = UserFile.objects.get(id=file_id)
     file_path = file.file.path
 
-    df = pd.read_csv(file_path)
+    df = read_csv_auto(file_path)
     df = df.head(5)
     x = request.GET.get('x')
     y = request.GET.get('y')
@@ -288,4 +273,7 @@ def preround_diagramm(request, file_id):
         
         return redirect(f"/add_file/{file_id}/preround_diagramm/round_diagramm/?x={selected_x}&y={selected_y}")
     
-    return render(request, 'preround_diagramm.html', {'string_columns': string_columns,'numeric_columns': numeric_columns,'file_id': file_id})
+    return render(request, 'preround_diagramm.html', {'string_columns': string_columns,
+                                                       'numeric_columns': numeric_columns,
+                                                       'file_id': file_id})
+                                                    
