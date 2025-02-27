@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 from io import BytesIO
 import base64
 
-@login_required
 def home(request):
     return render(request, 'home.html')
 
@@ -36,7 +35,7 @@ def registration_view(request):
             NewUser.objects.create_user(username=username, password=password)
             user = authenticate(request, username=username, password=password)
             if user is not None:
-                login(request, user)
+                login(request, user) 
                 return redirect('/')
             else:
                 return render(request, 'registration.html')
@@ -70,17 +69,17 @@ def load_file(request):
 def file_id(request, file_id):
     return render(request, 'id_file.html', {'file_id': file_id})
 
-def read_csv_auto(file_path):
-    df = pd.read_csv(file_path, engine='python')
-    if len(df.columns) == 1:
-        df = pd.read_csv(file_path, sep=';', engine='python')
-    return df
+# def read_csv_auto(file_path):
+#     df = pd.read_csv(file_path, engine='python')
+#     if len(df.columns) == 1:
+#         df = pd.read_csv(file_path, sep=';', engine='python')
+#     return df
      
 def grafic(request, file_id):
     file = UserFile.objects.get(id=file_id)
     file_path = file.file.path
 
-    df = read_csv_auto(file_path)
+    df = pd.read_csv(file_path, sep=None, engine='python')
     df = df.head(5)
     x = request.GET.get('x')
     y_list = request.GET.getlist('y')
@@ -126,7 +125,7 @@ def grafic(request, file_id):
 def pregrafic(request, file_id):
     file = UserFile.objects.get(id=file_id)
     file_path = file.file.path
-    df = pd.read_csv(file_path)
+    df = pd.read_csv(file_path, sep=None, engine='python')
     
     all_columns = df.columns.tolist()[1:]
     string_columns = [col for col in all_columns if pd.api.types.is_string_dtype(df[col])]
@@ -148,10 +147,7 @@ def pregrafic(request, file_id):
 def prestolb_diagramm(request, file_id):
     file = UserFile.objects.get(id=file_id)
     file_path = file.file.path
-    try:
-        df = pd.read_csv(file_path, delimiter=',')
-    except:
-        df = pd.read_csv(file_path, delimiter=';')
+    df = pd.read_csv(file_path, sep=None, engine='python')
     
     all_columns = df.columns.tolist()[1:]
     string_columns = [col for col in all_columns if pd.api.types.is_string_dtype(df[col])]
@@ -171,7 +167,7 @@ def stolb_diagramm(request, file_id):
     file = UserFile.objects.get(id=file_id)
     file_path = file.file.path
 
-    df = read_csv_auto(file_path)
+    df = pd.read_csv(file_path, sep=None, engine='python')
     df = df.head(5)
     x = request.GET.get('x')
     y = request.GET.get('y')
@@ -214,7 +210,7 @@ def round_diagramm(request, file_id):
     file = UserFile.objects.get(id=file_id)
     file_path = file.file.path
 
-    df = read_csv_auto(file_path)
+    df = pd.read_csv(file_path, sep=None, engine='python')
     df = df.head(5)
     x = request.GET.get('x')
     y = request.GET.get('y')
@@ -261,7 +257,7 @@ def round_diagramm(request, file_id):
 def preround_diagramm(request, file_id):
     file = UserFile.objects.get(id=file_id)
     file_path = file.file.path
-    df = pd.read_csv(file_path)
+    df = pd.read_csv(file_path, sep=None, engine='python')
     
     all_columns = df.columns.tolist()[1:]
     string_columns = [col for col in all_columns if pd.api.types.is_string_dtype(df[col])]
