@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-
 {% load static %}
 
 {% block content %}
@@ -8,7 +7,11 @@
     <p class="lead">Превратите сложные наборы данных в понятные графики и диаграммы за несколько кликов. Наш инструмент создан для удобного анализа и представления информации в визуальном формате.</p>
     <img src="{% static 'img/rtx4090.jpg' %}" width="150" alt="Пример визуализации">
     <div class="mt-4">
-        <a href="/register/" class="btn btn-primary btn-lg">Начать сейчас</a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'load_file' %}" class="btn btn-primary btn-lg">Начать сейчас</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="btn btn-primary btn-lg">Начать сейчас</a>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

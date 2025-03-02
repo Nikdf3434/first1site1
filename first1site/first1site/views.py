@@ -23,6 +23,7 @@ def login_view(request):
             login(request, user)
             return redirect('/')
         else:
+            messages.error(request, "Неверное имя пользователя или пароль")
             return render(request, 'login.html')
     return render(request, 'login.html')
 
@@ -31,15 +32,19 @@ def registration_view(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         password2 = request.POST.get('password2')
-        if password == password2:
-            NewUser.objects.create_user(username=username, password=password)
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
-                login(request, user) 
-                return redirect('/')
-            else:
-                return render(request, 'registration.html')
+        if password != password2:
+            messages.error(request, "Пароли не совпадают. Попробуйте снова.")
+            return render(request, 'registration.html')
+        NewUser.objects.create_user(username=username, password=password)
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('/')
+        else:
+            messages.error(request, "Ошибка при авторизации нового пользователя.")
+            return render(request, 'registration.html')
     return render(request, 'registration.html')
+
 
 @login_required
 def user_logout(request):
@@ -245,7 +250,7 @@ def round_diagramm(request, file_id):
         plt.close()
         return response
 
-    buf = BytesIO()
+    buf = BytesIO()                                      
     plt.savefig(buf, format='png')
     buf.seek(0)
     image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
