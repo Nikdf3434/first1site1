@@ -32,6 +32,11 @@ def registration_view(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         password2 = request.POST.get('password2')
+        usernames = NewUser.objects.values_list('username', flat=True)
+        print(usernames)
+        if username in usernames:
+            messages.error(request, 'Пользователь с таким именем уже есть!')
+            return render(request, 'registration.html')
         if password != password2:
             messages.error(request, "Пароли не совпадают. Попробуйте снова.")
             return render(request, 'registration.html')
@@ -85,7 +90,6 @@ def grafic(request, file_id):
     file_path = file.file.path
 
     df = pd.read_csv(file_path, sep=None, engine='python')
-    df = df.head(5)
     x = request.GET.get('x')
     y_list = request.GET.getlist('y')
     x_data = df[x]
@@ -98,6 +102,7 @@ def grafic(request, file_id):
     plt.title('График данных из CSV', fontsize=16)
     plt.xlabel(x, fontsize=12)
     plt.ylabel('Значения', fontsize=12)
+    plt.xticks(rotation=60)
     plt.legend()
     plt.grid(True)
 
@@ -173,7 +178,6 @@ def stolb_diagramm(request, file_id):
     file_path = file.file.path
 
     df = pd.read_csv(file_path, sep=None, engine='python')
-    df = df.head(5)
     x = request.GET.get('x')
     y = request.GET.get('y')
     x_data = df[x]
@@ -184,6 +188,7 @@ def stolb_diagramm(request, file_id):
     plt.title('Диаграмма из CSV-файла', fontsize=16)
     plt.xlabel(x, fontsize=12)
     plt.ylabel(y, fontsize=12)
+    plt.xticks(rotation=60)
 
     download_format = request.GET.get('download', None)
     if download_format:
@@ -216,7 +221,6 @@ def round_diagramm(request, file_id):
     file_path = file.file.path
 
     df = pd.read_csv(file_path, sep=None, engine='python')
-    df = df.head(5)
     x = request.GET.get('x')
     y = request.GET.get('y')
 
@@ -232,6 +236,7 @@ def round_diagramm(request, file_id):
         colors=['#ff9999', '#66b3ff', '#99ff99', '#ffcc99', 'blue', 'red', 'green']
     )
     plt.title('Круговая диаграмма')
+    plt.xticks(rotation=60)
 
     download_format = request.GET.get('download', None)
     if download_format:

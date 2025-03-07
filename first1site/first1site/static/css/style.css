@@ -7,6 +7,12 @@ body {
     text-align: center;
 }
 
+.container { display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
+    gap: 10px; }
+.column { padding: 20px;
+    text-align: left}
+
 #header {
     background: rgba(0, 0, 0, 0.8);
     padding: 20px;

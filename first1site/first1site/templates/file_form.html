@@ -14,11 +14,15 @@
         {{ file_form.as_p}}
         <button type="submit">Отправить</button>
     </form>
-    <ul>
+    <div class="container"> 
+    <div class="column"></div> 
+    <div class="column"><ul>
         {% if user.is_authenticated %}
         {% for file in all_files %}
         <a href="/add_file/{{file.id}}"><li>{{file.file}}</li>
         {% endfor %}
         {% endif %}
-    </ul>
+    </ul></div> 
+    <div class="column"></div> 
+    </div>
 {%endblock%}
