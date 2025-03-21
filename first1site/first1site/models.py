@@ -8,7 +8,6 @@ class NewUser(AbstractUser):
 
 def v(file):
     ext = os.path.splitext(file.name)[-1].lower()
-    print(ext)
     if ext != '.csv':
         raise ValidationError('Разрешены только файлы формата CSV.')
 

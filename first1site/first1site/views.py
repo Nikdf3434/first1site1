@@ -9,6 +9,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from io import BytesIO
 import base64
+from django.shortcuts import get_object_or_404
 
 def home(request):
     return render(request, 'home.html')
@@ -59,9 +60,21 @@ def user_logout(request):
 def password_reset_(request):
     return render(request, 'password_reset.html')
 
+def read_csv(file_path):
+    df = pd.read_csv(file_path, sep=None, engine='python')
+    first_row = df.iloc[0]
+    if all(pd.to_numeric(first_row, errors='coerce').notnull()):
+        df = df.iloc[1:].reset_index(drop=True)
+    return df
+ 
 def load_file(request):
     if request.method == 'POST' and request.FILES['file']:
         form = UserFileForm(request.POST, request.FILES)
+        uploaded_file = request.FILES['file']
+        file_name = uploaded_file.name
+        if UserFile.objects.filter(file__icontains=file_name, user=request.user).exists():
+            messages.error(request, "Этот файл уже загружен!")
+            return HttpResponseRedirect(request.path)
         if form.is_valid():
             userfile = form.save(commit=False)
             userfile.user = request.user
@@ -70,39 +83,45 @@ def load_file(request):
         elif not form.is_valid():
             print(form.errors)
             messages.error(request, "Разрешены только CSV файлы!")
+        
         return HttpResponseRedirect(request.path)
     else:
         form = UserFileForm()
     all_files = UserFile.objects.filter(user=request.user)
     return render(request, 'file_form.html', {'file_form': form, 'all_files': all_files})
 
+@login_required
+def delete_file(request, file_id):
+    file_obj = get_object_or_404(UserFile, id=file_id, user=request.user)
+    file_obj.file.delete(save=False)
+    file_obj.delete()
+    messages.success(request, "Файл успешно удалён!")
+    return redirect('load_file')
+
 def file_id(request, file_id):
     return render(request, 'id_file.html', {'file_id': file_id})
-
-# def read_csv_auto(file_path):
-#     df = pd.read_csv(file_path, engine='python')
-#     if len(df.columns) == 1:
-#         df = pd.read_csv(file_path, sep=';', engine='python')
-#     return df
      
 def grafic(request, file_id):
     file = UserFile.objects.get(id=file_id)
     file_path = file.file.path
 
-    df = pd.read_csv(file_path, sep=None, engine='python')
+    df = read_csv(file_path)
+    count = len(df)
+    if count < 20:
+        count = 20
     x = request.GET.get('x')
     y_list = request.GET.getlist('y')
     x_data = df[x]
 
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(count//2, 6))
     for y in y_list:
         y_data = df[y]
         plt.plot(x_data, y_data, label=y)
 
     plt.title('График данных из CSV', fontsize=16)
-    plt.xlabel(x, fontsize=12)
-    plt.ylabel('Значения', fontsize=12)
-    plt.xticks(rotation=60)
+    plt.xlabel(x, fontsize=10)
+    plt.ylabel('Значения', fontsize=10)
+    plt.xticks(rotation=45)
     plt.legend()
     plt.grid(True)
 
@@ -135,7 +154,8 @@ def grafic(request, file_id):
 def pregrafic(request, file_id):
     file = UserFile.objects.get(id=file_id)
     file_path = file.file.path
-    df = pd.read_csv(file_path, sep=None, engine='python')
+    df = read_csv(file_path)
+
     
     all_columns = df.columns.tolist()[1:]
     string_columns = [col for col in all_columns if pd.api.types.is_string_dtype(df[col])]
@@ -157,7 +177,8 @@ def pregrafic(request, file_id):
 def prestolb_diagramm(request, file_id):
     file = UserFile.objects.get(id=file_id)
     file_path = file.file.path
-    df = pd.read_csv(file_path, sep=None, engine='python')
+    df = read_csv(file_path)
+
     
     all_columns = df.columns.tolist()[1:]
     string_columns = [col for col in all_columns if pd.api.types.is_string_dtype(df[col])]
@@ -177,13 +198,16 @@ def stolb_diagramm(request, file_id):
     file = UserFile.objects.get(id=file_id)
     file_path = file.file.path
 
-    df = pd.read_csv(file_path, sep=None, engine='python')
+    df = read_csv(file_path)[:100]
+    count = len(df)
+    if count < 20:
+        count = 20
     x = request.GET.get('x')
     y = request.GET.get('y')
     x_data = df[x]
     y_data = df[y]
 
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(count//2, 6))
     plt.bar(x_data, y_data, label=y, color='blue')
     plt.title('Диаграмма из CSV-файла', fontsize=16)
     plt.xlabel(x, fontsize=12)
@@ -220,14 +244,14 @@ def round_diagramm(request, file_id):
     file = UserFile.objects.get(id=file_id)
     file_path = file.file.path
 
-    df = pd.read_csv(file_path, sep=None, engine='python')
+    df = read_csv(file_path)
     x = request.GET.get('x')
     y = request.GET.get('y')
 
     categories = df[x]
     values = df[y]
 
-    plt.figure(figsize=(8, 8))
+    plt.figure(figsize=(128, 128))
     plt.pie(
         values,
         labels=categories,
@@ -267,7 +291,7 @@ def round_diagramm(request, file_id):
 def preround_diagramm(request, file_id):
     file = UserFile.objects.get(id=file_id)
     file_path = file.file.path
-    df = pd.read_csv(file_path, sep=None, engine='python')
+    df = read_csv(file_path)
     
     all_columns = df.columns.tolist()[1:]
     string_columns = [col for col in all_columns if pd.api.types.is_string_dtype(df[col])]

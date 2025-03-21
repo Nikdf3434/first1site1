@@ -8,9 +8,11 @@ body {
 }
 
 .container { display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px; }
-.column { padding: 20px;
+.center{ padding: 20px;
+    text-align: center}
+.column { padding: 5px;
     text-align: left}
 
 #header {
@@ -51,7 +53,7 @@ button {
 
 button:hover {
     background-color: #219653;
-    transform: scale(1.05);
+    transform: scale(1.05 );
 }
 
 a {

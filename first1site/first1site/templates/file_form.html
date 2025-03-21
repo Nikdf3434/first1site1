@@ -1,28 +1,39 @@
 {% extends "base.html" %}
-
 {% load static %}
-{% block content%}
-    {% if messages %}
-    <ul>
-        {% for message in messages %}
-            <li >{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    <form method="post" enctype="multipart/form-data">
+{% block content %}
+  <div class="container">
+    <div class="column"></div>
+    <div class="column">
+      <div class="center">
+      <h1>добавление и выбор файла</h1>
+      <div class="column">
+      {% if messages %}
+        <ul>
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+      </div>
+      <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ file_form.as_p}}
+        {{ file_form.as_p }}
         <button type="submit">Отправить</button>
-    </form>
-    <div class="container"> 
-    <div class="column"></div> 
-    <div class="column"><ul>
+      </form>
+      </div>
+      <div class="column">
+      <ul>
         {% if user.is_authenticated %}
-        {% for file in all_files %}
-        <a href="/add_file/{{file.id}}"><li>{{file.file}}</li>
-        {% endfor %}
+          {% for file in all_files %}
+            <li>
+              <a href="/add_file/{{ file.id }}">{{ file.file }}</a>
+              <a href="{% url 'delete_file' file.id %}">Удалить</a>
+            </li>
+          {% endfor %}
         {% endif %}
-    </ul></div> 
-    <div class="column"></div> 
+      </ul>
+      </div>
     </div>
-{%endblock%}
+    <div class="column"></div>
+  </div>
+{% endblock %}
