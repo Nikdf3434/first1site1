@@ -116,7 +116,11 @@ def grafic(request, file_id):
     plt.figure(figsize=(count//2, 6))
     for y in y_list:
         y_data = df[y]
-        plt.plot(x_data, y_data, label=y)
+        plt.plot(x_data, y_data, marker='o', label=y)
+        for x_val, y_val in zip(x_data, y_data):
+            plt.annotate(f'{y_val}', xy=(x_val, y_val),
+                         textcoords="offset points", xytext=(0, 5),
+                         ha='center', fontsize=8)
 
     plt.title('График данных из CSV', fontsize=16)
     plt.xlabel(x, fontsize=10)
@@ -128,7 +132,7 @@ def grafic(request, file_id):
     download_format = request.GET.get('download', None)
     if download_format:
         buf = BytesIO()
-        plt.savefig(buf, format=download_format)
+        plt.savefig(buf, format=download_format, bbox_inches='tight', pad_inches=0)
         buf.seek(0)
         if download_format.lower() in ['jpg', 'jpeg']:
             content_type = 'image/jpeg'
@@ -143,7 +147,7 @@ def grafic(request, file_id):
         return response
 
     buf = BytesIO()
-    plt.savefig(buf, format='png')
+    plt.savefig(buf, format='png', bbox_inches='tight', pad_inches=0)
     buf.seek(0)
     image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
     buf.close()
@@ -198,7 +202,7 @@ def stolb_diagramm(request, file_id):
     file = UserFile.objects.get(id=file_id)
     file_path = file.file.path
 
-    df = read_csv(file_path)[:100]
+    df = read_csv(file_path)
     count = len(df)
     if count < 20:
         count = 20
@@ -213,11 +217,13 @@ def stolb_diagramm(request, file_id):
     plt.xlabel(x, fontsize=12)
     plt.ylabel(y, fontsize=12)
     plt.xticks(rotation=60)
+    for i in range(len(x_data)):
+        plt.text(x_data[i], y_data[i] + 0.5, f'{y_data[i]}', ha='center')
 
     download_format = request.GET.get('download', None)
     if download_format:
         buf = BytesIO()
-        plt.savefig(buf, format=download_format)
+        plt.savefig(buf, format='png', bbox_inches='tight', pad_inches=0)
         buf.seek(0)
         if download_format.lower() in ['jpg', 'jpeg']:
             content_type = 'image/jpeg'
@@ -232,7 +238,7 @@ def stolb_diagramm(request, file_id):
         return response
 
     buf = BytesIO()
-    plt.savefig(buf, format='png')
+    plt.savefig(buf, format='png', bbox_inches='tight', pad_inches=0)
     buf.seek(0)
     image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
     buf.close()
@@ -244,18 +250,23 @@ def round_diagramm(request, file_id):
     file = UserFile.objects.get(id=file_id)
     file_path = file.file.path
 
-    df = read_csv(file_path)
+    df = read_csv(file_path)[:64]
     x = request.GET.get('x')
     y = request.GET.get('y')
 
     categories = df[x]
     values = df[y]
 
-    plt.figure(figsize=(128, 128))
+    count = len(df)
+    if count < 16:
+        count = 16
+    if count > 128:
+        count = 128
+    plt.figure(figsize=(count//2, count//2))
     plt.pie(
         values,
         labels=categories,
-        autopct='%d%%',
+        autopct='%.1f%%',
         startangle=90, 
         colors=['#ff9999', '#66b3ff', '#99ff99', '#ffcc99', 'blue', 'red', 'green']
     )
@@ -265,7 +276,7 @@ def round_diagramm(request, file_id):
     download_format = request.GET.get('download', None)
     if download_format:
         buf = BytesIO()
-        plt.savefig(buf, format=download_format)
+        plt.savefig(buf, format='png', bbox_inches='tight', pad_inches=0)
         buf.seek(0)
         if download_format.lower() in ['jpg', 'jpeg']:
             content_type = 'image/jpeg'
@@ -280,7 +291,7 @@ def round_diagramm(request, file_id):
         return response
 
     buf = BytesIO()                                      
-    plt.savefig(buf, format='png')
+    plt.savefig(buf, format='png', bbox_inches='tight', pad_inches=0)
     buf.seek(0)
     image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
     buf.close()
@@ -299,7 +310,7 @@ def preround_diagramm(request, file_id):
     
     if request.method == 'POST':
         selected_x = request.POST.get('x')
-        selected_y = request.POST.get('y')
+        selected_y = request.POST.get('y') 
         
         return redirect(f"/add_file/{file_id}/preround_diagramm/round_diagramm/?x={selected_x}&y={selected_y}")
     
