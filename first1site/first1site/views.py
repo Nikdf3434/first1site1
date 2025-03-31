@@ -1,3 +1,5 @@
+import matplotlib
+matplotlib.use('Agg')
 from django.http import HttpResponseRedirect, HttpResponse
 from .models import NewUser, UserFile
 from django.shortcuts import render, redirect
@@ -121,7 +123,7 @@ def grafic(request, file_id):
             plt.annotate(f'{y_val}', xy=(x_val, y_val),
                          textcoords="offset points", xytext=(0, 5),
                          ha='center', fontsize=8)
-
+    plt.margins(x=0.001)
     plt.title('График данных из CSV', fontsize=16)
     plt.xlabel(x, fontsize=10)
     plt.ylabel('Значения', fontsize=10)
@@ -211,8 +213,9 @@ def stolb_diagramm(request, file_id):
     x_data = df[x]
     y_data = df[y]
 
+    plt.margins(x=0.001)
     plt.figure(figsize=(count//2, 6))
-    plt.bar(x_data, y_data, label=y, color='blue')
+    plt.bar(x_data, y_data, label=y, color=['#ff9999', '#66b3ff', '#99ff99', '#ffcc99', 'blue', 'red', 'green'])
     plt.title('Диаграмма из CSV-файла', fontsize=16)
     plt.xlabel(x, fontsize=12)
     plt.ylabel(y, fontsize=12)
@@ -250,7 +253,7 @@ def round_diagramm(request, file_id):
     file = UserFile.objects.get(id=file_id)
     file_path = file.file.path
 
-    df = read_csv(file_path)[:64]
+    df = read_csv(file_path)
     x = request.GET.get('x')
     y = request.GET.get('y')
 

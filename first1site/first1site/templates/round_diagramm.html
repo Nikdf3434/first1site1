@@ -1,13 +1,27 @@
 {% extends "base.html" %}
 {% load static %}
+
+{% block title %}Круговая диаграмма{% endblock %}
+
 {% block content %}
-        <img src="data:image/png;base64,{{ image_base64 }}" alt="Круговая диаграмма">
-    <div style="margin-top: 20px;">
+<div class="container">
+    <h1>Круговая диаграмма</h1>
+
+    <div class="diagram-container" style="text-align: center;">
+        <img src="data:image/png;base64,{{ image_base64 }}" alt="Круговая диаграмма" style="max-width: 100%; height: auto; display: inline-block;">
+    </div>
+
+    <div class="download-links">
         {% with current_params=request.GET.urlencode %}
-            <a href="?{{ current_params }}&download=png" class="download-link">Скачать PNG</a> |
-            <a href="?{{ current_params }}&download=jpg" class="download-link">Скачать JPG</a> |
-            <a href="?{{ current_params }}&download=pdf" class="download-link">Скачать PDF</a>
+            <a href="?{{ current_params }}&download=png" class="button-like">Скачать PNG</a>
+            <a href="?{{ current_params }}&download=jpg" class="button-like">Скачать JPG</a>
+            <a href="?{{ current_params }}&download=pdf" class="button-like">Скачать PDF</a>
         {% endwith %}
     </div>
+     <div style="margin-top: 1.5rem; text-align: center;">
+        <a href="{% url 'file_id' file.id %}">Выбрать другой тип графика</a> |
+        <a href="{% url 'load_file' %}">К списку файлов</a>
+    </div>
+</div>
 {% endblock %}
 

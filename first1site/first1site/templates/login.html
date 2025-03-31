@@ -1,21 +1,33 @@
 {% extends "base.html" %}
-
 {% load static %}
+
+{% block title %}Авторизация{% endblock %}
+
 {% block content %}
+<div class="container">
     <h1>Авторизация</h1>
+
     {% if messages %}
-      <ul>
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-      </ul>
+    <div class="messages">
+        <ul>
+            {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    </div>
     {% endif %}
+
     <form method="post">
         {% csrf_token %}
-        <input type="text" name="username" placeholder="Username">
-        <input type="password" name="password" placeholder="Password">
+        <label for="id_username">Имя пользователя:</label>
+        <input type="text" name="username" id="id_username" placeholder="Введите имя пользователя" required>
+
+        <label for="id_password">Пароль:</label>
+        <input type="password" name="password" id="id_password" placeholder="Введите пароль" required>
+
         <button type="submit">Войти</button>
-    </form> 
-    <p><a href="{% url 'password_reset' %}">Forgot your password?</a></p>
+    </form>
+
     <p>Еще нет аккаунта? <a href="{% url 'registration' %}">Зарегистрироваться</a></p>
+</div>
 {% endblock %}

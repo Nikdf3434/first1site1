@@ -1,39 +1,52 @@
 {% extends "base.html" %}
 {% load static %}
+
+{% block title %}Загрузка и выбор файла{% endblock %}
+
 {% block content %}
-  <div class="container">
-    <div class="column"></div>
-    <div class="column">
-      <div class="center">
-      <h1>добавление и выбор файла</h1>
-      <div class="column">
-      {% if messages %}
+<div class="container">
+    <h1>Добавление и выбор файла</h1>
+
+    {% if messages %}
+    <div class="messages">
         <ul>
-          {% for message in messages %}
-            <li>{{ message }}</li>
-          {% endfor %}
+            {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
         </ul>
-      {% endif %}
-      </div>
-      <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ file_form.as_p }}
-        <button type="submit">Отправить</button>
-      </form>
-      </div>
-      <div class="column">
-      <ul>
-        {% if user.is_authenticated %}
-          {% for file in all_files %}
-            <li>
-              <a href="/add_file/{{ file.id }}">{{ file.file }}</a>
-              <a href="{% url 'delete_file' file.id %}">Удалить</a>
-            </li>
-          {% endfor %}
-        {% endif %}
-      </ul>
-      </div>
     </div>
-    <div class="column"></div>
-  </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label for="{{ file_form.file.id_for_label }}">{{ file_form.file.label }}:</label>
+        {{ file_form.file }}
+        {% if file_form.file.errors %}
+            <div class="messages">
+                <ul>
+                {% for error in file_form.file.errors %}
+                    <li class="error">{{ error }}</li>
+                {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        <button type="submit">Загрузить файл</button>
+    </form>
+
+    <h2>Ваши файлы:</h2>
+    <div class="file-list">
+        <ul>
+            {% if user.is_authenticated %}
+                {% for file in all_files %}
+                    <li>
+                        <a href="{% url 'file_id' file.id %}">{{ file.file.name|cut:"users_file/" }}</a> {# Display cleaner filename #}
+                        <a href="{% url 'delete_file' file.id %}" onclick="return confirm('Вы уверены, что хотите удалить этот файл?');">Удалить</a> {# Added confirmation #}
+                    </li>
+                {% empty %}
+                    <li>У вас пока нет загруженных файлов.</li>
+                {% endfor %}
+            {% endif %}
+        </ul>
+    </div>
+</div>
 {% endblock %}

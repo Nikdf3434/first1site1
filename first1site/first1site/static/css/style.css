@@ -1,72 +1,81 @@
 body {
     font-family: 'Helvetica Neue', Arial, sans-serif;
-    background: linear-gradient(135deg, #111, #444); 
-    color: #f1f1f1;
+    background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+    color: #333;
     margin: 0;
     padding: 0;
     text-align: center;
-}
-
-.container { display: grid;
+    }
+    
+    .container {
+    display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 10px; }
-.center{ padding: 20px;
-    text-align: center}
-.column { padding: 5px;
-    text-align: left}
-
-#header {
-    background: rgba(0, 0, 0, 0.8);
+    gap: 10px;
+    }
+    
+    .center {
     padding: 20px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    }
+    
+    .column {
+    padding: 5px;
+    text-align: left;
+    }
+    
+    #header {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
-}
-
-#main {
-    background: rgba(255, 255, 255, 0.05);
+    }
+    
+    #main {
+    background: rgba(255, 255, 255, 0.8);
     min-height: 750px;
     padding: 40px;
-}
-
-#footer {
-    background: #000;
-    color: #fff;
+    }
+    
+    #footer {
+    background: #fafafa;
+    color: #333;
     padding: 20px;
     margin-top: 20px;
-}
-
-h1, h2, h3 {
-    color: #fff;
+    border-top: 1px solid #e0e0e0;
+    }
+    
+    h1, h2, h3 {
+    color: #444;
     margin-bottom: 20px;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
-}
-
-button {
-    background-color: #27ae60;
+    text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.6);
+    }
+    
+    button {
+    background-color: #ff8a80;
     color: #fff;
     border: none;
     border-radius: 10px;
     padding: 12px 25px;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-button:hover {
-    background-color: #219653;
-    transform: scale(1.05 );
-}
-
-a {
-    color: #27ae60;
+    }
+    
+    button:hover {
+    background-color: #ff5252;
+    transform: scale(1.05);
+    }
+    
+    a {
+    color: #3cff00;
     text-decoration: none;
     transition: color 0.3s ease;
-}
-
-a:hover {
-    color: #fff;
-}
-
-div {
+    }
+    
+    a:hover {
+    color: #0a5e07;
+    }
+    
+    div {
     margin: 0;
     padding: 0;
-}
+    }

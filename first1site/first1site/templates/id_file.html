@@ -1,14 +1,17 @@
 {% extends "base.html" %}
 {% load static %}
+
+{% block title %}Выбор типа визуализации{% endblock %}
+
 {% block content%}
-    <h1>Выберите тип</h1>
-    <a href="{% url 'pregrafic' file_id=file_id %}">
-        <button type="submit">График</button>
-    </a>
-    <a href="{% url 'prestolb_diagramm' file_id=file_id %}">
-    <button>Столбчатая диаграмма</button>
-    </a>
-    <a href="{% url 'preround_diagramm' file_id=file_id %}">
-        <button>Круговая диаграмма</button>
-        </a>
+<div class="container">
+    <h1>Выберите тип визуализации</h1>
+    <p>Выберите, как вы хотите представить данные из вашего файла:</p>
+
+    <div style="text-align: center; margin-top: 2rem;">
+        <a href="{% url 'pregrafic' file_id=file_id %}" class="button-like">Линейный график</a>
+        <a href="{% url 'prestolb_diagramm' file_id=file_id %}" class="button-like">Столбчатая диаграмма</a>
+        <a href="{% url 'preround_diagramm' file_id=file_id %}" class="button-like">Круговая диаграмма</a>
+    </div>
+</div>
 {%endblock%}

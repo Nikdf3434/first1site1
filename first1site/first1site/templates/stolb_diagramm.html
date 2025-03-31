@@ -1,14 +1,26 @@
 {% extends "base.html" %}
 {% load static %}
+
+{% block title %}Столбчатая диаграмма{% endblock %}
+
 {% block content %}
-    <div style="width: 100%; overflow-x: auto; white-space: nowrap;">
+<div class="container">
+    <h1>Столбчатая диаграмма</h1>
+
+    <div class="diagram-container">
         <img src="data:image/png;base64,{{ image_base64 }}" alt="Столбчатая диаграмма">
     </div>
-        <div style="margin-top: 20px;">
-            {% with current_params=request.GET.urlencode %}
-                <a href="?{{ current_params }}&download=png" class="download-link">Скачать PNG</a> |
-                <a href="?{{ current_params }}&download=jpg" class="download-link">Скачать JPG</a> |
-                <a href="?{{ current_params }}&download=pdf" class="download-link">Скачать PDF</a>
-            {% endwith %}
-        </div>
+
+    <div class="download-links">
+        {% with current_params=request.GET.urlencode %}
+            <a href="?{{ current_params }}&download=png" class="button-like">Скачать PNG</a>
+            <a href="?{{ current_params }}&download=jpg" class="button-like">Скачать JPG</a>
+            <a href="?{{ current_params }}&download=pdf" class="button-like">Скачать PDF</a>
+        {% endwith %}
+    </div>
+    <div style="margin-top: 1.5rem; text-align: center;">
+        <a href="{% url 'file_id' file.id %}">Выбрать другой тип графика</a> |
+        <a href="{% url 'load_file' %}">К списку файлов</a>
+    </div>
+</div>
 {% endblock %}
